@@ -1,6 +1,6 @@
 /* =========================================================
    Coffee House Static PWA
-   script.js - نسخة نظيفة
+   script.js - نسخة نظيفة ومحدثة
    =========================================================
    يحتوي على:
    1) إعدادات الكوفي القابلة للتغيير
@@ -11,6 +11,7 @@
    6) QR Scanner + Manual Code
    7) اللغة والثيم
    8) زر تثبيت التطبيق PWA
+   9) إصلاح إرسال واتساب للجوال وPWA
    ========================================================= */
 
 /* =========================================================
@@ -18,18 +19,18 @@
    ========================================================= */
 const COFFEE_CONFIG = {
   coffeeId: "coffee-house-001", // غيّره لكل كوفي
-  coffeeName: "Break Time", // اسم الكوفي
+  coffeeName: "Coffee House", // اسم الكوفي
   tagline: "Specialty Coffee & Fresh Taste", // وصف قصير
-  whatsappNumber: "962786237678", // رقم الواتساب بدون +
+  whatsappNumber: "9627XXXXXXXX", // رقم الواتساب بدون + أو مسافات
   currency: "JOD",
   cashierQrSecret: "CH-LOYALTY-STORE-001", // لازم يطابق cashier-qr.html
-  scanCooldownMinutes: 5, // مهلة إعادة احتساب النقاط من نفس الجهاز
+  scanCooldownMinutes: 180, // مهلة إعادة احتساب النقاط من نفس الجهاز
   pointsPerScan: 10, // عدد النقاط المضافة عند مسح QR صحيح
   tiers: {
-    bronzeMax: 199,
-    silverMax: 449,
+    bronzeMax: 99,
+    silverMax: 249
     // Gold = أعلى من silverMax
-  },
+  }
 };
 
 /* =========================================================
@@ -41,11 +42,11 @@ const STORAGE_KEYS = {
   customer: `${COFFEE_CONFIG.coffeeId}_customer`,
   orders: `${COFFEE_CONFIG.coffeeId}_orders`,
   points: `${COFFEE_CONFIG.coffeeId}_points`,
-  lastQrClaimAt: `${COFFEE_CONFIG.coffeeId}_last_qr_claim_at`,
+  lastQrClaimAt: `${COFFEE_CONFIG.coffeeId}_last_qr_claim_at`
 };
 
 const SESSION_KEYS = {
-  qrClaimedThisSession: `${COFFEE_CONFIG.coffeeId}_qr_claimed_this_session`,
+  qrClaimedThisSession: `${COFFEE_CONFIG.coffeeId}_qr_claimed_this_session`
 };
 
 /* =========================================================
@@ -88,8 +89,7 @@ const I18N = {
     orderCode: "رقم الطلب",
     paidOn: "تاريخ الطلب",
     scannerTitle: "مسح QR الكاش",
-    scannerHint:
-      "وجّه الكاميرا إلى QR الموجود عند الكاش لتأكيد إضافة نقاط الولاء.",
+    scannerHint: "وجّه الكاميرا إلى QR الموجود عند الكاش لتأكيد إضافة نقاط الولاء.",
     manualQrLabel: "أو أدخل كود الكاش يدويًا",
     openCamera: "فتح الكاميرا",
     stopCamera: "إيقاف الكاميرا",
@@ -99,7 +99,7 @@ const I18N = {
     gold: "Gold",
     pointsAdded: "تمت إضافة النقاط بنجاح",
     pointsAddedSubtitle: "أحسنت! تم تحديث رصيد الولاء.",
-    orderSent: "تم حفظ الطلب وفتح واتساب لإرساله.",
+    orderSent: "تم حفظ الطلب وسيتم تحويلك إلى واتساب.",
     validationName: "يرجى إدخال الاسم.",
     validationPhone: "يرجى إدخال رقم الهاتف.",
     validationAddress: "يرجى إدخال العنوان.",
@@ -108,15 +108,13 @@ const I18N = {
     noPreviousOrders: "لا توجد طلبات سابقة بعد.",
     invalidCashierQr: "هذا ليس QR الكاش الصحيح.",
     scanCooldown: "تم احتساب النقاط سابقًا. حاول لاحقًا.",
-    cameraNotSupported:
-      "المتصفح لا يدعم مسح QR بالكاميرا. استخدم الإدخال اليدوي.",
+    cameraNotSupported: "المتصفح لا يدعم مسح QR بالكاميرا. استخدم الإدخال اليدوي.",
     cameraPermissionError: "تعذر فتح الكاميرا. تأكد من السماح بالوصول.",
     quickScanLabel: "📷 امسح كود الكاش لتحصل على نقاطك",
     installApp: "📲 نزّل التطبيق على هاتفك",
-    installIosHint:
-      "على iPhone: افتح الموقع في Safari ثم Share ثم Add to Home Screen.",
-    installAppUnavailable:
-      "خيار التثبيت غير متاح الآن. استخدم Chrome على Android أو Safari على iPhone.",
+    installIosHint: "على iPhone: افتح الموقع في Safari ثم Share ثم Add to Home Screen.",
+    installAppUnavailable: "خيار التثبيت غير متاح الآن. استخدم Chrome على Android أو Safari على iPhone.",
+    whatsappOpenError: "تعذر فتح واتساب. تأكد من تثبيت واتساب وصحة الرقم."
   },
   en: {
     brandName: COFFEE_CONFIG.coffeeName,
@@ -134,8 +132,7 @@ const I18N = {
     customerNamePlaceholder: "Name",
     customerPhonePlaceholder: "Phone Number",
     customerAddressPlaceholder: "Address",
-    pendingPointsHint:
-      "After payment at the cashier, scan the QR to get loyalty points.",
+    pendingPointsHint: "After payment at the cashier, scan the QR to get loyalty points.",
     bestSeller: "Best Seller",
     add: "Add",
     emptyCart: "Your cart is empty.",
@@ -144,8 +141,7 @@ const I18N = {
     orderCode: "Order ID",
     paidOn: "Order Date",
     scannerTitle: "Scan Cashier QR",
-    scannerHint:
-      "Point the camera to the cashier QR to confirm loyalty points.",
+    scannerHint: "Point the camera to the cashier QR to confirm loyalty points.",
     manualQrLabel: "Or enter the cashier code manually",
     openCamera: "Open Camera",
     stopCamera: "Stop Camera",
@@ -155,7 +151,7 @@ const I18N = {
     gold: "Gold",
     pointsAdded: "Points added successfully",
     pointsAddedSubtitle: "Great! Your loyalty balance has been updated.",
-    orderSent: "Order saved and WhatsApp was opened.",
+    orderSent: "Order saved and you will be redirected to WhatsApp.",
     validationName: "Please enter your name.",
     validationPhone: "Please enter your phone number.",
     validationAddress: "Please enter your address.",
@@ -164,17 +160,14 @@ const I18N = {
     noPreviousOrders: "No previous orders yet.",
     invalidCashierQr: "This is not the correct cashier QR.",
     scanCooldown: "Points were already claimed recently. Please try later.",
-    cameraNotSupported:
-      "This browser does not support QR camera scanning. Use manual input.",
-    cameraPermissionError:
-      "Could not access the camera. Please allow camera access.",
+    cameraNotSupported: "This browser does not support QR camera scanning. Use manual input.",
+    cameraPermissionError: "Could not access the camera. Please allow camera access.",
     quickScanLabel: "📷 Scan cashier QR to get your points",
     installApp: "📲 Install the app on your phone",
-    installIosHint:
-      "On iPhone: open the site in Safari, tap Share, then Add to Home Screen.",
-    installAppUnavailable:
-      "Install is not available right now. Use Chrome on Android or Safari on iPhone.",
-  },
+    installIosHint: "On iPhone: open the site in Safari, tap Share, then Add to Home Screen.",
+    installAppUnavailable: "Install is not available right now. Use Chrome on Android or Safari on iPhone.",
+    whatsappOpenError: "Could not open WhatsApp. Make sure WhatsApp is installed and the number is correct."
+  }
 };
 
 /* =========================================================
@@ -236,7 +229,7 @@ const el = {
 
   pointsSuccess: document.getElementById("pointsSuccess"),
   pointsSuccessTitle: document.getElementById("pointsSuccessTitle"),
-  pointsSuccessSubtitle: document.getElementById("pointsSuccessSubtitle"),
+  pointsSuccessSubtitle: document.getElementById("pointsSuccessSubtitle")
 };
 
 /* =========================================================
@@ -252,7 +245,7 @@ function formatCurrency(value) {
 
 function createCustomerCode() {
   const randomPart =
-    window.crypto && crypto.randomUUID
+    (window.crypto && crypto.randomUUID)
       ? crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase()
       : Math.random().toString(36).slice(2, 10).toUpperCase();
 
@@ -269,7 +262,7 @@ function getStoredCustomer() {
 
   const customer = {
     code: createCustomerCode(),
-    createdAt: Date.now(),
+    createdAt: Date.now()
   };
 
   localStorage.setItem(STORAGE_KEYS.customer, JSON.stringify(customer));
@@ -299,17 +292,12 @@ function getCustomerLevel(points) {
 }
 
 function calculateOrderTotal(items) {
-  return items.reduce(
-    (sum, item) => sum + Number(item.price) * Number(item.qty),
-    0,
-  );
+  return items.reduce((sum, item) => sum + (Number(item.price) * Number(item.qty)), 0);
 }
 
 function formatDate(timestamp) {
   try {
-    return new Date(timestamp).toLocaleString(
-      currentLanguage === "ar" ? "ar-JO" : "en-US",
-    );
+    return new Date(timestamp).toLocaleString(currentLanguage === "ar" ? "ar-JO" : "en-US");
   } catch {
     return new Date(timestamp).toLocaleString();
   }
@@ -417,7 +405,7 @@ function renderSummary() {
 }
 
 function renderFilters() {
-  document.querySelectorAll(".filter-btn").forEach((btn) => {
+  document.querySelectorAll(".filter-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.filter === currentFilter);
   });
 }
@@ -425,12 +413,12 @@ function renderFilters() {
 function renderMenu() {
   el.menuGrid.innerHTML = "";
 
-  const filteredItems = menuData.filter((item) => {
+  const filteredItems = menuData.filter(item => {
     if (currentFilter === "all") return true;
     return item.type === currentFilter;
   });
 
-  filteredItems.forEach((item) => {
+  filteredItems.forEach(item => {
     const card = document.createElement("article");
     card.className = "menu-card glass";
 
@@ -446,17 +434,13 @@ function renderMenu() {
       <button class="add-btn" type="button">${t("add")}</button>
     `;
 
-    card
-      .querySelector(".add-btn")
-      .addEventListener("click", () => addToCart(item));
+    card.querySelector(".add-btn").addEventListener("click", () => addToCart(item));
     el.menuGrid.appendChild(card);
   });
 }
 
 function renderCart() {
-  el.cartCount.textContent = String(
-    cart.reduce((sum, item) => sum + item.qty, 0),
-  );
+  el.cartCount.textContent = String(cart.reduce((sum, item) => sum + item.qty, 0));
   el.cartItems.innerHTML = "";
 
   if (cart.length === 0) {
@@ -514,9 +498,9 @@ function renderOrders() {
 
   const sortedOrders = [...orders].sort((a, b) => b.createdAt - a.createdAt);
 
-  sortedOrders.forEach((order) => {
+  sortedOrders.forEach(order => {
     const preview = order.items
-      .map((item) => `${item.name[currentLanguage]} × ${item.qty}`)
+      .map(item => `${item.name[currentLanguage]} × ${item.qty}`)
       .join(" • ");
 
     const orderCard = document.createElement("div");
@@ -537,9 +521,7 @@ function renderOrders() {
       </div>
     `;
 
-    orderCard
-      .querySelector(".repeat-btn")
-      .addEventListener("click", () => repeatOrder(order.id));
+    orderCard.querySelector(".repeat-btn").addEventListener("click", () => repeatOrder(order.id));
     el.ordersList.appendChild(orderCard);
   });
 }
@@ -548,7 +530,7 @@ function renderOrders() {
    9) السلة
    ========================================================= */
 function addToCart(item) {
-  const found = cart.find((cartItem) => cartItem.name.ar === item.name.ar);
+  const found = cart.find(cartItem => cartItem.name.ar === item.name.ar);
 
   if (found) {
     found.qty += 1;
@@ -621,66 +603,87 @@ function sendOrderToWhatsApp() {
     customerName: el.customerName.value.trim(),
     customerPhone: el.customerPhone.value.trim(),
     customerAddress: el.customerAddress.value.trim(),
-    items: cart.map((item) => ({ ...item })),
+    items: cart.map(item => ({ ...item })),
     total,
-    createdAt: Date.now(),
+    createdAt: Date.now()
   };
 
-  const titleLine =
-    currentLanguage === "ar"
-      ? `طلب جديد - ${COFFEE_CONFIG.coffeeName}`
-      : `New Order - ${COFFEE_CONFIG.coffeeName}`;
-  const itemsLabel = currentLanguage === "ar" ? "الأصناف:" : "Items:";
-  const totalLabel = currentLanguage === "ar" ? "المجموع" : "Total";
-  const nameLabel = currentLanguage === "ar" ? "الاسم" : "Name";
-  const phoneLabel = currentLanguage === "ar" ? "الهاتف" : "Phone";
-  const addressLabel = currentLanguage === "ar" ? "العنوان" : "Address";
-  const orderCodeLabel = currentLanguage === "ar" ? "رقم الطلب" : "Order ID";
-  const customerCodeLabel =
-    currentLanguage === "ar" ? "كود العميل" : "Customer Code";
+  const isArabic = currentLanguage === "ar";
 
-  const messageLines = [
-    titleLine,
-    `${orderCodeLabel}: ${order.id}`,
-    `${customerCodeLabel}: ${order.customerCode}`,
-    "",
-    itemsLabel,
-  ];
+  let message = "";
+  message += isArabic
+    ? `طلب جديد - ${COFFEE_CONFIG.coffeeName}\n`
+    : `New Order - ${COFFEE_CONFIG.coffeeName}\n`;
 
-  order.items.forEach((item) => {
-    messageLines.push(
-      `- ${item.name[currentLanguage]} × ${item.qty} = ${formatCurrency(item.price * item.qty)}`,
-    );
+  message += isArabic
+    ? `رقم الطلب: ${order.id}\n`
+    : `Order ID: ${order.id}\n`;
+
+  message += isArabic
+    ? `كود العميل: ${order.customerCode}\n\n`
+    : `Customer Code: ${order.customerCode}\n\n`;
+
+  message += isArabic ? "الأصناف:\n" : "Items:\n";
+
+  order.items.forEach(item => {
+    message += `- ${item.name[currentLanguage]} x${item.qty} = ${formatCurrency(item.price * item.qty)}\n`;
   });
 
-  messageLines.push("");
-  messageLines.push(`${totalLabel}: ${formatCurrency(order.total)}`);
-  messageLines.push(`${nameLabel}: ${order.customerName}`);
-  messageLines.push(`${phoneLabel}: ${order.customerPhone}`);
-  messageLines.push(`${addressLabel}: ${order.customerAddress}`);
+  message += "\n";
+  message += isArabic
+    ? `المجموع: ${formatCurrency(order.total)}\n`
+    : `Total: ${formatCurrency(order.total)}\n`;
 
-  const whatsappUrl = `https://wa.me/${COFFEE_CONFIG.whatsappNumber}?text=${encodeURIComponent(messageLines.join("\n"))}`;
+  message += isArabic
+    ? `الاسم: ${order.customerName}\n`
+    : `Name: ${order.customerName}\n`;
 
+  message += isArabic
+    ? `الهاتف: ${order.customerPhone}\n`
+    : `Phone: ${order.customerPhone}\n`;
+
+  message += isArabic
+    ? `العنوان: ${order.customerAddress}\n`
+    : `Address: ${order.customerAddress}\n`;
+
+  const phone = String(COFFEE_CONFIG.whatsappNumber).replace(/\D/g, "");
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+
+  // نحفظ الطلب أولًا
   const orders = getStoredOrders();
   orders.push(order);
   setStoredOrders(orders);
 
-  window.open(whatsappUrl, "_blank");
-
+  // نفرغ السلة قبل التحويل
   cart = [];
   renderCart();
   renderOrders();
   closeCart();
 
   alert(t("orderSent"));
+
+  // طريقة أكثر توافقًا مع الجوال وPWA
+  try {
+    window.location.href = whatsappUrl;
+  } catch {
+    try {
+      const newWindow = window.open(whatsappUrl, "_blank");
+      if (!newWindow) {
+        alert(t("whatsappOpenError"));
+      }
+    } catch {
+      alert(t("whatsappOpenError"));
+    }
+  }
 }
 
 function repeatOrder(orderId) {
   const orders = getStoredOrders();
-  const order = orders.find((item) => item.id === orderId);
+  const order = orders.find(item => item.id === orderId);
   if (!order) return;
 
-  cart = order.items.map((item) => ({ ...item }));
+  cart = order.items.map(item => ({ ...item }));
   renderCart();
   openCart();
 }
@@ -695,21 +698,17 @@ function addPointsToCustomer(points) {
 }
 
 function canClaimQrPointsNow() {
-  const claimedThisSession = sessionStorage.getItem(
-    SESSION_KEYS.qrClaimedThisSession,
-  );
+  const claimedThisSession = sessionStorage.getItem(SESSION_KEYS.qrClaimedThisSession);
 
   if (claimedThisSession === "true") {
     return false;
   }
 
-  const lastClaimAt = Number(
-    localStorage.getItem(STORAGE_KEYS.lastQrClaimAt) || "0",
-  );
+  const lastClaimAt = Number(localStorage.getItem(STORAGE_KEYS.lastQrClaimAt) || "0");
   const now = Date.now();
   const cooldownMs = COFFEE_CONFIG.scanCooldownMinutes * 60 * 1000;
 
-  if (lastClaimAt && now - lastClaimAt < cooldownMs) {
+  if (lastClaimAt && (now - lastClaimAt) < cooldownMs) {
     return false;
   }
 
@@ -761,7 +760,7 @@ async function startScanner() {
 
     scannerStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: "environment" } },
-      audio: false,
+      audio: false
     });
 
     el.scannerVideo.srcObject = scannerStream;
@@ -796,7 +795,7 @@ function stopScanner() {
   }
 
   if (scannerStream) {
-    scannerStream.getTracks().forEach((track) => track.stop());
+    scannerStream.getTracks().forEach(track => track.stop());
     scannerStream = null;
   }
 
@@ -872,7 +871,7 @@ function bindEvents() {
   el.langEnBtn.addEventListener("click", () => setLanguage("en"));
   el.themeBtn.addEventListener("click", toggleTheme);
 
-  document.querySelectorAll(".filter-btn").forEach((btn) => {
+  document.querySelectorAll(".filter-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       currentFilter = btn.dataset.filter;
       renderFilters();
@@ -904,6 +903,7 @@ function bindEvents() {
       }
 
       deferredInstallPrompt.prompt();
+
       try {
         await deferredInstallPrompt.userChoice;
       } catch {}
