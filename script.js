@@ -23,7 +23,7 @@ const COFFEE_CONFIG = {
   whatsappNumber: "962786237678", // رقم الواتساب بدون +
   currency: "JOD",
   cashierQrSecret: "CH-LOYALTY-STORE-001", // لازم يطابق cashier-qr.html
-  scanCooldownMinutes: 180, // مهلة إعادة احتساب النقاط من نفس الجهاز
+  scanCooldownMinutes: 5, // مهلة إعادة احتساب النقاط من نفس الجهاز
   pointsPerScan: 10, // عدد النقاط المضافة عند مسح QR صحيح
   tiers: {
     bronzeMax: 199,
