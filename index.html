@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <!-- إعدادات أساسية للموبايل -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- اسم الصفحة - غيّره إذا بدك -->
+    <title>Coffee House</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#6f4e37" />
+
+    <!-- ملف التصميم -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!--
+    =================================================
+    عناصر تغيّرها حسب كل كوفي:
+    1) اسم الكوفي والوصف من script.js > COFFEE_CONFIG
+    2) الشعار:
+       images/logo-192.png
+       images/logo-512.png
+    3) الخلفية:
+       images/bg.jpg
+    4) صور المنيو:
+       images/...
+    =================================================
+  -->
+
+    <!-- ================= HEADER ================= -->
+    <header class="topbar glass">
+      <div class="brand-wrap">
+        <!-- لوجو الكوفي -->
+        <img src="images/logo-192.png" alt="Coffee Logo" class="brand-logo" />
+
+        <div class="brand-text">
+          <!-- يتم تعبئتهم من script.js -->
+          <h1 id="brandName">Coffee House</h1>
+          <p id="brandTagline">Specialty Coffee & Fresh Taste</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="langArBtn" class="control-btn">AR</button>
+        <button id="langEnBtn" class="control-btn">EN</button>
+        <button id="themeBtn" class="control-btn" aria-label="Toggle theme">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= SUMMARY ================= -->
+    <section class="summary-row">
+      <div class="summary-card glass">
+        <div class="summary-title" id="customerCodeLabel">كود العميل</div>
+        <div class="summary-value mono" id="customerCodeValue">-</div>
+      </div>
+
+      <div class="summary-card glass">
+        <div class="summary-title" id="loyaltyPointsLabel">نقاط الولاء</div>
+        <div class="summary-value" id="pointsValue">0</div>
+      </div>
+
+      <div class="summary-card glass">
+        <div class="summary-title" id="customerLevelLabel">مستوى العميل</div>
+        <div class="summary-value" id="levelValue">Bronze</div>
+      </div>
+    </section>
+
+    <!-- ================= QUICK ACTIONS ================= -->
+    <section class="quick-actions">
+      <!-- زر مسح QR الكاش -->
+      <button id="quickScanBtn" class="primary-btn quick-scan-btn">
+        📷 امسح كود الكاش لتحصل على نقاطك
+      </button>
+
+      <!-- زر تثبيت التطبيق PWA -->
+      <button id="installAppBtn" class="secondary-btn quick-scan-btn" hidden>
+        📲 نزّل التطبيق على هاتفك
+      </button>
+    </section>
+
+    <!-- ================= FILTERS ================= -->
+    <section class="filters glass">
+      <button class="filter-btn active" data-filter="all" id="filterAllBtn">
+        الكل
+      </button>
+      <button class="filter-btn" data-filter="hot" id="filterHotBtn">
+        ساخن
+      </button>
+      <button class="filter-btn" data-filter="cold" id="filterColdBtn">
+        بارد
+      </button>
+    </section>
+
+    <!-- ================= MENU ================= -->
+    <main class="page-content">
+      <section id="menuGrid" class="menu-grid"></section>
+    </main>
+
+    <!-- ================= FLOATING CART BUTTON ================= -->
+    <button id="cartFab" class="cart-fab" aria-label="Open cart">
+      🛒 <span id="cartCount">0</span>
+    </button>
+
+    <!-- ================= CART DRAWER ================= -->
+    <aside id="cartDrawer" class="cart-drawer">
+      <div class="cart-header">
+        <h2 id="cartTitle">السلة</h2>
+        <button id="closeCartBtn" class="icon-btn" aria-label="Close cart">
+          ✕
+        </button>
+      </div>
+
+      <div class="cart-scroll">
+        <!-- عناصر السلة -->
+        <div id="cartItems" class="cart-items"></div>
+
+        <!-- المجموع -->
+        <div class="cart-total glass">
+          <span id="totalLabel">المجموع</span>
+          <strong id="cartTotalValue">0.00 JOD</strong>
+        </div>
+
+        <!-- ملاحظة النقاط -->
+        <div class="cart-note glass" id="pendingPointsHint">
+          بعد الدفع عند الكاش، امسح QR لتحصل على نقاط الولاء.
+        </div>
+
+        <!-- بيانات العميل -->
+        <div class="form-grid">
+          <input
+            id="customerName"
+            type="text"
+            class="form-input"
+            placeholder="الاسم"
+          />
+          <input
+            id="customerPhone"
+            type="tel"
+            class="form-input"
+            placeholder="رقم الهاتف"
+          />
+          <input
+            id="customerAddress"
+            type="text"
+            class="form-input"
+            placeholder="العنوان"
+          />
+        </div>
+
+        <!-- زر إرسال الطلب -->
+        <button id="sendOrderBtn" class="primary-btn">
+          إرسال الطلب إلى واتساب
+        </button>
+
+        <!-- الطلبات السابقة -->
+        <div class="section-head">
+          <h3 id="previousOrdersTitle">الطلبات السابقة</h3>
+        </div>
+        <div id="ordersList" class="orders-list"></div>
+      </div>
+    </aside>
+
+    <!-- طبقة خلفية عند فتح السلة -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- ================= QR SCANNER MODAL ================= -->
+    <div id="scannerModal" class="modal">
+      <div class="modal-card glass">
+        <div class="modal-head">
+          <h3 id="scannerTitle">مسح QR الكاش</h3>
+          <button id="closeScannerBtn" class="icon-btn">✕</button>
+        </div>
+
+        <p id="scannerHint" class="scanner-hint">
+          وجّه الكاميرا إلى QR الموجود عند الكاش لتأكيد إضافة نقاط الولاء.
+        </p>
+
+        <!-- عرض الكاميرا -->
+        <video
+          id="scannerVideo"
+          class="scanner-video"
+          playsinline
+          muted
+        ></video>
+
+        <!-- أزرار التحكم بالكاميرا -->
+        <div class="scanner-actions">
+          <button id="startScannerBtn" class="primary-btn">فتح الكاميرا</button>
+          <button id="stopScannerBtn" class="secondary-btn">
+            إيقاف الكاميرا
+          </button>
+        </div>
+
+        <!-- إدخال يدوي -->
+        <div class="manual-box">
+          <label for="manualQrInput" id="manualQrLabel"
+            >أو أدخل كود الكاش يدويًا</label
+          >
+          <input
+            id="manualQrInput"
+            class="form-input"
+            type="text"
+            placeholder="مثال: CH-LOYALTY-STORE-001"
+          />
+          <button id="manualQrSubmitBtn" class="secondary-btn">
+            تأكيد الكود
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SUCCESS ANIMATION ================= -->
+    <div id="pointsSuccess" class="points-success" aria-hidden="true">
+      <div class="points-card">
+        <div class="points-icon">⭐</div>
+        <div class="points-title" id="pointsSuccessTitle">
+          تمت إضافة النقاط بنجاح
+        </div>
+        <div class="points-subtitle" id="pointsSuccessSubtitle">
+          أحسنت! تم تحديث رصيد الولاء.
+        </div>
+      </div>
+    </div>
+
+    <!-- ملف الجافاسكربت الرئيسي -->
+    <script src="script.js"></script>
+  </body>
+</html>
