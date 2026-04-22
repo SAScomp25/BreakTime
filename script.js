@@ -18,16 +18,16 @@
    ========================================================= */
 const COFFEE_CONFIG = {
   coffeeId: "coffee-house-001", // غيّره لكل كوفي
-  coffeeName: "Coffee House", // اسم الكوفي
+  coffeeName: "Break Time", // اسم الكوفي
   tagline: "Specialty Coffee & Fresh Taste", // وصف قصير
-  whatsappNumber: "962XXXXXXXXX", // رقم الواتساب بدون +
+  whatsappNumber: "962786237678", // رقم الواتساب بدون +
   currency: "JOD",
   cashierQrSecret: "CH-LOYALTY-STORE-001", // لازم يطابق cashier-qr.html
   scanCooldownMinutes: 180, // مهلة إعادة احتساب النقاط من نفس الجهاز
   pointsPerScan: 10, // عدد النقاط المضافة عند مسح QR صحيح
   tiers: {
-    bronzeMax: 99,
-    silverMax: 249,
+    bronzeMax: 199,
+    silverMax: 449,
     // Gold = أعلى من silverMax
   },
 };
