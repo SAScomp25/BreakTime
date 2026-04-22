@@ -21,7 +21,7 @@ const COFFEE_CONFIG = {
   coffeeId: "coffee-house-001", // غيّره لكل كوفي
   coffeeName: "Coffee House", // اسم الكوفي
   tagline: "Specialty Coffee & Fresh Taste", // وصف قصير
-  whatsappNumber: "9627XXXXXXXX", // رقم الواتساب بدون + أو مسافات
+  whatsappNumber: "962786237678", // رقم الواتساب بدون + أو مسافات
   currency: "JOD",
   cashierQrSecret: "CH-LOYALTY-STORE-001", // لازم يطابق cashier-qr.html
   scanCooldownMinutes: 180, // مهلة إعادة احتساب النقاط من نفس الجهاز
